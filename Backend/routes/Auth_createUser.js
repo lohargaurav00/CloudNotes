@@ -2,9 +2,14 @@ const express = require("express");
 const Users = require("../models/Users");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
-router.get(
+const jwtSecret = "Check_Auth_Gaurav";
+
+// create a user using: Post "api/auth/createUser no login required"
+
+router.post(
   "/",
   [
     body("email", "Enter a valid email address").isEmail(),
@@ -26,17 +31,25 @@ router.get(
       }
 
       const salt = await bcrypt.genSalt(10);
-      const secPass = await bcrypt.hash(req.body.password,salt);
+      const secPass = await bcrypt.hash(req.body.password, salt);
 
       user = await Users.create({
         name: req.body.name,
         email: req.body.email,
         password: secPass,
       });
-      res.json(user);
+
+      const data = {
+        User: {
+          id: user.id,
+        },
+      };
+
+      const jwtToken = jwt.sign(data, jwtSecret);
+      res.json({"authToken":jwtToken});
     } catch (err) {
       console.log(err.message);
-      res.status(500).send("Some error occurred");
+      res.status(500).send("Internal server error");
     }
   }
 );
