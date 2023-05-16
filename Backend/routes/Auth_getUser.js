@@ -5,15 +5,17 @@ const { body, validationResult } = require("express-validator");
 const fetchUser = require("../middleware/fetchuser");
 
 router.post("/", fetchUser, async (req, res) => {
+  let success = false;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return res.status(400).json({success, errors: errors.array() });
   }
 
   try {
     userId = req.user.id;
     const user = await Users.findById(userId).select("-password");
-    res.send(user);
+    success = true
+    res.send({success,user});
   } catch (error) {
     console.log(error.message);
     res.status(500).send("Internal server error");

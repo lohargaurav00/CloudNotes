@@ -3,9 +3,10 @@ const jwtSecret = "Check_Auth_Gaurav";
 
 //get the user from jwt token and add id to req object
 const fetchUser = (req, res, next) => {
+  let success = false;
   const token = req.header("auth-token");
   if (!token) {
-    res.status(401).send({ error: "Please authenticate using a valid token" });
+    res.status(401).send({success, error: "Please authenticate using a valid token" });
   }
 
   try {
@@ -14,7 +15,7 @@ const fetchUser = (req, res, next) => {
     next();
   } catch (error) {
     console.log(error.message);
-    res.status(401).send({ error: "Please authenticate using a valid token" });
+    res.status(401).send({success, error: "Please authenticate using a valid token" });
   }
 
 };

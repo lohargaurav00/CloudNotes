@@ -17,6 +17,7 @@ router.post(
   ],
 
   async (req, res) => {
+    let success = false
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -27,7 +28,7 @@ router.post(
       if (user) {
         return res
           .status(400)
-          .send({ error: "Email id already exit's!! use a valid email id" });
+          .send({success, error: "Email id already exit's!! use a valid email id" });
       }
 
       const salt = await bcrypt.genSalt(10);
@@ -46,7 +47,8 @@ router.post(
       };
 
       const jwtToken = jwt.sign(data, jwtSecret);
-      res.json({"authToken":jwtToken});
+      success = true;
+      res.json({success,"authToken":jwtToken});
     } catch (err) {
       console.log(err.message);
       res.status(500).send("Internal server error");
